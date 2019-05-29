@@ -4,6 +4,9 @@
     let loader = new THREE.OBJLoader();
     let currentState = 0;
     let DPD;
+    let clock = new THREE.Clock();
+    //获取二维数据
+    let lampSts;
 
     init();
     animate();
@@ -27,9 +30,17 @@
         container.appendChild(renderer.domElement);
 
         // controls
-        controls = new THREE.OrbitControls(
-            camera, renderer.domElement
-        );
+        controls = new THREE.TouchFPC(camera);
+        controls.lookSpeed = 0.8; //鼠标移动查看的速度
+        controls.movementSpeed = 10; //相机移动速度
+        controls.noFly = true;
+        controls.lookVertical = true;
+        controls.constrainVertical = true; //约束垂直
+        controls.verticalMin = 1.0;
+        controls.verticalMax = 2.0;
+        controls.lon = -100; //进入初始视角x轴的角度
+        controls.lat = 0; //初始视角进入后y轴的角度
+
         scene.add(new THREE.AmbientLight(0xffffff, 0.5));
 
         light = new THREE.SpotLight(0xffffff);
@@ -45,21 +56,11 @@
         window.addEventListener('resize', onWindowResize, false);
 
         initMesh();
-        
+
         //接收主页面发送的设备数据对象
         window.addEventListener('message',function(event){
             DPD = event.data;
         });
-        
-        //获取二维数据
-        let lampSts;
-        setInterval(function(){
-            lampSts = readData('电气',138,0);
-            if(lampSts!=currentState && lampSts==1)
-                turnOnLight();
-            else if(lampSts!=currentState && lampSts==0)
-                turnOffLight();
-        },100);
     }
 
 
@@ -80,28 +81,35 @@
             obj.children[1].material2 = new THREE.MeshPhysicalMaterial({emissive: 0xffffee, emissiveIntensity: 1, color: 0x000000});
             obj.name = "mainObj";
             scene.add(obj);
+
+            setInterval(function(){
+                lampSts = readData('电气',138,0);
+                if(lampSts!=currentState && lampSts==1)
+                    turnOnLight();
+                else if(lampSts!=currentState && lampSts==0)
+                    turnOffLight();
+            },100);
         });
     }
 
     function turnOnLight() {
         let obj = scene.getObjectByName("mainObj");
+        switchMaterial(obj.children[1]);
         let myLight = new THREE.PointLight( 0xffee88, 0.5, 100, 2);
         myLight.name = "myLight";
-        // bulbLight.add(new THREE.Mesh(new THREE.SphereBufferGeometry(10,10,10),new THREE.MeshBasicMaterial({color:0xff0000})));
         myLight.position.set(
             obj.children[1].geometry.boundingBox.getCenter().x,
             obj.children[1].geometry.boundingBox.getCenter().y,
             obj.children[1].geometry.boundingBox.getCenter().z-200);
         myLight.castShadow = true;
         obj.children[1].add( myLight );
-        switchMaterial(obj.children[1]);
         currentState = 1;
     }
 
     function turnOffLight() {
         let obj = scene.getObjectByName("mainObj");
-        obj.children[1].remove(obj.children[1].getObjectByName("myLight"));
         switchMaterial(obj.children[1]);
+        obj.children[1].remove(obj.children[1].getObjectByName("myLight"));
         currentState = 0;
     }
 
@@ -184,7 +192,8 @@
         requestAnimationFrame(animate);
         renderer.render(scene, camera);
         updateLight();
-        controls.update();
+        controls.object.position.set(controls.targetObject.position.x,controls.targetObject.position.y,controls.targetObject.position.z);
+        controls.update(clock.getDelta());
     }
 
     function onWindowResize() {
@@ -204,5 +213,4 @@
         );
         light.target = obj;
     }
-
 })();
