@@ -205,7 +205,8 @@
     //绑定灯光到摄像机
     function updateLight() {
         light.position.set(camera.position.x, camera.position.y, camera.position.z);
-        let ps = camera.getWorldDirection();
+        let ps = new THREE.Vector3();
+        camera.getWorldDirection(ps);
         obj.position.set(
             camera.position.x + ps.x * 10,
             camera.position.y + ps.y * 10,
