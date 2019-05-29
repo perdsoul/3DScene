@@ -59,7 +59,7 @@
                 turnOnLight();
             else if(lampSts!=currentState && lampSts==0)
                 turnOffLight();
-        },1000);
+        },100);
     }
 
 
