@@ -3,6 +3,7 @@
     let container;
     let loader = new THREE.OBJLoader();
     let currentState = 0;
+    let DPD;
 
     init();
     animate();
@@ -43,6 +44,12 @@
 
         initMesh();
 
+
+        //接收主页面发送的设备数据对象
+        window.addEventListener('message',function(event){
+            DPD = event.data;
+        });
+
         //获取二维数据
         let lampSts;
         setInterval(function(){
@@ -54,12 +61,15 @@
         },1000);
     }
 
+
     //layer:电气,id:138,valId:0;
-    //状态: 开：1 ，关：0 ;
+    //状态: 开：1 ，关：0 无数据：false;
     function readData(layer,id,valId){
-        var DPD = window.parent.DPD;
-        console.log('状态：'+DPD[layer][id]['varValue'+valId][0]);
-        return DPD[layer][id]['varValue'+valId][0]//1 开   0 关
+        if(DPD!=undefined){
+            return DPD[layer][id]['varValue'+valId][0]//1 开   0 关
+        }else{
+            return false;
+        }
     }
 
     function initMesh() {
