@@ -42,8 +42,9 @@
         light.target = obj;
         scene.add(light);
 
-        initMesh();
+        window.addEventListener('resize', onWindowResize, false);
 
+        initMesh();
 
         //接收主页面发送的设备数据对象
         window.addEventListener('message',function(event){
@@ -186,6 +187,12 @@
         controls.update();
     }
 
+    function onWindowResize() {
+        camera.aspect = window.innerWidth / window.innerHeight;
+        camera.updateProjectionMatrix();
+        renderer.setSize(window.innerWidth, window.innerHeight);
+    }
+    
     //绑定灯光到摄像机
     function updateLight() {
         light.position.set(camera.position.x, camera.position.y, camera.position.z);
