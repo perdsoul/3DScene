@@ -46,20 +46,10 @@
 
         initMesh();
         
-//         //接收主页面发送的设备数据对象
-//         window.addEventListener('message',function(event){
-//             DPD = event.data;
-//         });
-
-//         //获取二维数据
-//         let lampSts;
-//         setInterval(function(){
-//             lampSts = readData('电气',138,0);
-//             if(lampSts!=currentState && lampSts==1)
-//                 turnOnLight();
-//             else if(lampSts!=currentState && lampSts==0)
-//                 turnOffLight();
-//         },100);
+        //接收主页面发送的设备数据对象
+        window.addEventListener('message',function(event){
+            DPD = event.data;
+        });
     }
 
 
@@ -80,6 +70,16 @@
             obj.children[1].material2 = new THREE.MeshPhysicalMaterial({emissive: 0xffffee, emissiveIntensity: 1, color: 0x000000});
             obj.name = "mainObj";
             scene.add(obj);
+            
+            //获取二维数据
+            let lampSts;
+            setInterval(function(){
+                lampSts = readData('电气',138,0);
+                if(lampSts!=currentState && lampSts==1)
+                    turnOnLight();
+                else if(lampSts!=currentState && lampSts==0)
+                    turnOffLight();
+            },500);
         });
     }
 
