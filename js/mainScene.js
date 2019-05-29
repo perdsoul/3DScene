@@ -45,6 +45,21 @@
         window.addEventListener('resize', onWindowResize, false);
 
         initMesh();
+        
+        //接收主页面发送的设备数据对象
+        window.addEventListener('message',function(event){
+            DPD = event.data;
+        });
+
+        //获取二维数据
+        let lampSts;
+        setInterval(function(){
+            lampSts = readData('电气',138,0);
+            if(lampSts!=currentState && lampSts==1)
+                turnOnLight();
+            else if(lampSts!=currentState && lampSts==0)
+                turnOffLight();
+        },100);
     }
 
 
@@ -65,27 +80,11 @@
             obj.children[1].material2 = new THREE.MeshPhysicalMaterial({emissive: 0xffffee, emissiveIntensity: 1, color: 0x000000});
             obj.name = "mainObj";
             scene.add(obj);
-            
-            //接收主页面发送的设备数据对象
-            window.addEventListener('message',function(event){
-                DPD = event.data;
-            });
-
-            //获取二维数据
-            let lampSts;
-            setInterval(function(){
-                lampSts = readData('电气',138,0);
-                if(lampSts!=currentState && lampSts==1)
-                    turnOnLight();
-                else if(lampSts!=currentState && lampSts==0)
-                    turnOffLight();
-            },100);
         });
     }
 
     function turnOnLight() {
         let obj = scene.getObjectByName("mainObj");
-        switchMaterial(obj.children[1]);
         let myLight = new THREE.PointLight( 0xffee88, 0.5, 100, 2);
         myLight.name = "myLight";
         // bulbLight.add(new THREE.Mesh(new THREE.SphereBufferGeometry(10,10,10),new THREE.MeshBasicMaterial({color:0xff0000})));
@@ -95,13 +94,14 @@
             obj.children[1].geometry.boundingBox.getCenter().z-200);
         myLight.castShadow = true;
         obj.children[1].add( myLight );
+        switchMaterial(obj.children[1]);
         currentState = 1;
     }
 
     function turnOffLight() {
         let obj = scene.getObjectByName("mainObj");
-        switchMaterial(obj.children[1]);
         obj.children[1].remove(obj.children[1].getObjectByName("myLight"));
+        switchMaterial(obj.children[1]);
         currentState = 0;
     }
 
