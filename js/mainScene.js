@@ -46,20 +46,20 @@
 
         initMesh();
         
-        //接收主页面发送的设备数据对象
-        window.addEventListener('message',function(event){
-            DPD = event.data;
-        });
+//         //接收主页面发送的设备数据对象
+//         window.addEventListener('message',function(event){
+//             DPD = event.data;
+//         });
 
-        //获取二维数据
-        let lampSts;
-        setInterval(function(){
-            lampSts = readData('电气',138,0);
-            if(lampSts!=currentState && lampSts==1)
-                turnOnLight();
-            else if(lampSts!=currentState && lampSts==0)
-                turnOffLight();
-        },100);
+//         //获取二维数据
+//         let lampSts;
+//         setInterval(function(){
+//             lampSts = readData('电气',138,0);
+//             if(lampSts!=currentState && lampSts==1)
+//                 turnOnLight();
+//             else if(lampSts!=currentState && lampSts==0)
+//                 turnOffLight();
+//         },100);
     }
 
 
